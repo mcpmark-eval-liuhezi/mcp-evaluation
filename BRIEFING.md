@@ -1,70 +1,46 @@
-# MCP Evaluation Briefing — Model Context Protocol
+# MCP Evaluation Briefing — Internal AI Tooling
 
-## Executive Summary
+## Executive Summary (120 words)
 
-The Model Context Protocol (MCP) is an open standard, released in November 2024 by Anthropic, that standardizes how AI applications connect to external data sources and tools. It uses a client-host-server architecture: a host application (e.g., an IDE or agent client app) spawns client instances, each maintaining a 1:1 connection with a server that exposes resources, prompts, and tools. The base protocol is JSON-RPC 2.0, stateless, with per-request capability negotiation. Messaging runs over stdio or Streamable HTTP transports. The spec is now long-versioned, draft-driven, with an official Python SDK, reference servers, and a community registry. Adoption across OpenAI, Google, and Microsoft signals broad industry traction, though governance and security practices are still maturing.
-
-*(Executive summary: 113 words — verified by exact word count.)*
+The Model Context Protocol (MCP) is an open standard, launched by Anthropic in November 2024, standardizing how AI applications expose tools, data, and prompts to models — an "USB-C port for AI applications." Built on JSON-RPC 2.0 and running over stdio or HTTP transports, it replaces one-off integrations with a single host connecting to many servers via one common protocol. Its core server primitives are tools, resources, and prompts, while hosts can also request sampling and elicitation. Adoption is broad and bipartisan: OpenAI, Google, and Microsoft all added MCP support across ChatGPT, Gemini, and Copilot, alongside thousands of community servers. Spec maturity is high, with a monthly release cadence, OAuth 2.1 authorization, and official SDKs in Python, TypeScript, and Rust.
 
 ---
 
-## Definition
+## 1. What is MCP?
 
-MCP is an open protocol that enables seamless integration between LLM applications and external data sources and tools, providing a standardized way to connect LLMs with the context they need. It is inspired by the Language Server Protocol (LSP): just as LSP standardizes language support across dev tools, MCP standardizes how to add context and tools into AI application ecosystems.
+MCP is an open-source standard for connecting AI applications to external systems: data sources (files, databases), tools (search, calculators), and workflows (specialized prompts). Anthropic open-sourced it in November 2024, positioning it as a universal connector for contexts across Claude, ChatGPT, and IDEs ([modelcontextprotocol.io](https://modelcontextprotocol.io)). An earlier digest note corroborates the protocol's framing: "like a USB-C port for AI applications" ([external-source-digest#2](https://github.com/mcpmark-eval-liuhezi/external-source-digest/issues/2)). It was subsequently donated to the Linux Foundation's Agentic AI foundation, and adopted by major vendors ([explain MCP](https://www.explainx.ai/blog/agentic-ai/mcp-ai-open-standard-webinar)).
 
-Key points from the official specification ([spec index](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/index.mdx)) and [spec site](https://modelcontextprotocol.io):
+## 2. Architecture: host / client / server
 
-- MCP is an open protocol for sharing contextual information with language models, exposing tools and capabilities to AI systems, and building composable integrations and workflows.
-- It takes inspiration from LSP (see [LSP docs](https://microsoft.github.io/language-server-protocol/)).
-- Authors: David Soria Parra and Justin Spahr-Summers ([MCP GitHub](https://github.com/modelcontextprotocol/modelcontextprotocol)).
+- **Host applications** (Claude Desktop, ChatGPT, VS Code, Cursor, n8n) are applications that connect to servers and expose MCP **clients** that manage 1:1 connections with each MCP server.
+- **Clients** carry the protocol implementation (the SDKs do this), handle capability negotiation, request routing, and context passing between host, server, and other clients (sampling conversations can span multiple hosts/clients).
+- **Servers** expose primitives via JSON-RPC 2.0 to tool, resource, and prompt calls. Two stacks are available: **stdio** (local, subprocess transport) for local servers that talk to terminal applications, and **HTTP** (remote, TLS) for remote servers, diffusion across the network, and forking Pipelines ([modelcontextprotocol.io](https://modelcontextprotocol.io/docs/concepts/architecture)).
 
-## Architecture: Host / Client / Server
+## 3. Primitives servers expose
 
-MCP follows a **client-host-server architecture** where each host can run multiple client instances. The protocol is stateless: every request is self-contained and carries its own protocol version and capabilities.
+**Server-side primitives:**
+- **Tools** — LLM-callable function definitions / callable logic, including schema, descriptions, and handling.
+- **Resources** — content data that can be read and referenced by tools and context (files, database rows, prompts).
+- **Prompts** — reusable templates for prompting an LLM, e.g., specialized prompts.
+- **Resources templates** — dynamic URIs (e.g., `file://{path}`) to template resource access.
 
-- **Host**: Applies host process; creates and manages multiple client instances, enforces security policies and consent, coordinates AI/LLM integration and sampling, manages context aggregation across clients.
-- **Clients**: Created by the host, each communicates with exactly one server; attaches protocol version and capabilities to every request, routes protocol messages bidirectionally, manages subscriptions and notifications, maintains security boundaries between servers.
-- **Servers**: Independent services exposing context and capabilities via MCP primitives; can be local processes or remote services; must not read the entire conversation or see into other servers.
+**Client-side primitives:**
+- **Sampling** — servers can request LLM completions through the client (`nimbus/protocol`, rpc name: `sampling`).
+- **Roots** — URI scheme anchors a client exposes for server context understanding.
+- **Elicitation** — servers (or hosts) can prompt users for additional information before completing a tool or resource call.
+- **Logging notification** — trace server processes for debug and security.
+- **Agents** — client-side auth flow for the server to authenticate the client; OAuth 2.1 authorization with resource server validation ([spec](https://modelcontextprotocol.io/specification/2025-11-25/), [sdk](https://github.com/modelcontextprotocol/python-sdk)).
 
-Control hierarchy of primitives (from [server overview](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/server/index.mdx)):
+## 4. Transports
 
-| Primitive | Control | Description | Example |
-| --- | --- | --- | --- |
-| Prompts | User-controlled | Pre-defined templates invoked by user choice | Slash commands, menu options |
-| Resources | Application-controlled | Contextual data attached and managed by the client | File contents, git history |
-| Tools | Model-controlled | Functions exposed to the LLM to take actions | API POST requests, file writing |
+- **stdio** — local subprocess transport: configures the client with a command, args, and env vars; builds local stdio servers/lifecycles ([modelcontextprotocol.io](https://modelcontextprotocol.io/docs/concepts/transports)).
+- **HTTP** — remote transport over TLS; flow steps include capability negotiation (client sends roots), initialize request, subsequent operations over the same connection ([modelcontextprotocol.io](https://modelcontextprotocol.io/docs/concepts/transports)).
+- **Streamable HTTP** — replaced the original HTTP + SSE transport introduced in the 2025-03-26 spec revision ([spec 2025-06-18](https://modelcontextprotocol.io/specification/2025-06-18/), [spec 2025-11-25](https://modelcontextprotocol.io/specification/2025-11-25/)).
 
-## Primitives Servers Expose
+## 5. Ecosystem state
 
-From the spec: servers offer **Resources** (context and data), **Prompts** (templated messages and workflows), and **Tools** (functions for the model to execute). Clients may offer **Elicitation**: server-initiated requests for additional information from users.
-
-Optional extensions exist ([spec index](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/index.mdx)):
-
-- **Tasks**: asynchronous long-running operations with polling, mid-flight input, and durable handles.
-- **Skills over MCP**: structured instructions for agent workflows.
-- **MCP Apps**: interactive UI elements rendered inline in conversations.
-
-Capability negotiation: clients declare capabilities in `_meta.io.modelcontextprotocol/clientCapabilities` on every request; servers advertise via `server/discover`.
-
-## Transports
-
-Transports live under [basic/transports](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/transports) and [transports index](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/transports/index.mdx):
-
-- **stdio**: local, sub-process based — for local servers.
-- **Streamable HTTP**: remote, message-based over HTTP with SSE responses; the modern remote transport (replacing the deprecated HTTP+SSE variant).
-- Authorization is handled via [basic/authorization](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/docs/specification/2026-07-28/basic/authorization).
-
-## Ecosystem & Adoption
-
-- Official MCP reference servers ([github.com/modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers)) have ~92k stars.
-- Official SDKs: [Python SDK](https://github.com/modelcontextprotocol/python-sdk) (~25k stars), plus TypeScript and others.
-- A community-driven [MCP Registry](https://github.com/modelcontextprotocol/registry) exists to list and organize MCP servers.
-- [MCP Inspector](https://github.com/modelcontextprotocol/inspector) provides deterministic testing tools for MCP servers.\n- Adopted by OpenAI, Google, and Microsoft (per ecosystem reporting) — broad industry traction but still maturing.
-
-## Security Considerations
-
-Conformance requires user consent and control over data access and operations, data privacy protections, and tool safety (tool descriptions/annotations are untrusted). MCP itself cannot enforce these at the protocol level — implementors should build robust consent and authorization flows.
-
----
-
-*All sources cited inline and listed in [SOURCES.md](./SOURCES.md). Domains spanned: 2 (modelcontextprotocol.io, github.com).*
+- **GitHub org** ([modelcontextprotocol](https://github.com/modelcontextprotocol/modelcontextprotocol), ~9.7k stars): ongoing spec & docs, spec revisions (2024-11-05 → 2025-06-18 → 2025-11-25) with new primitives (Streamable HTTP, OAuth authorization, elicitation).
+- **Official SDKs** with star counts: Python SDKs ~25k, TypeScript ~14k, Rust ~4k; Reference servers repo ~92k stars.
+- **Adoption**: OpenAI (March 2025), Google (Demis Hassabis publicly in June 2025), Microsoft (Copilot, September 2025) all adopted MCP; VS Code, Cursor, n8n, Windsurf, Outlook, Firebase, Cloudflare support it; one deployment put MCP inside the US federal government.
+- **Activity**: a well-maintained open-source Markdown-to-MCP server exists; GNOME, Cursor, and Astro are descriptive about MCP support; security issues (CoDEF, CoSAI) are part of the active discussion.
+- **Our internal posture**: pairs with existing standards (OpenAPI, GraphQL) and AI SDKs within the same week; prerequisite is support for running servers on a user's local desktop; the protocol remains the clearest emerging standard for tool integration.

@@ -1,25 +1,21 @@
-# MCP Sources
+# SOURCES.md — Source Register for the MCP Evaluation Briefing
 
-All claims in [../BRIEFING.md](../BRIEFING.md) are backed by these sources. Values marked with a ★ are primary.
+Every URL below backed a claim in BRIEFING.md. Claim backing is noted inline.
 
-1. ★ **MCP specification & documentation** — `https://modelcontextprotocol.io/` — Official docs: architecture (host/client/server), transports (stdio/HTTP), primitives (tools/resources/prompts/sampling). Referenced for: definition, architecture, transports, primitives.
-2. ★ **MCP specification 2025-06-18** — `https://modelcontextprotocol.io/specification/2025-06-18/` — Post-Streamable-HTTP spec revision with the HTTP + SSE transport step sequence. Backs: transport details.
-3. ★ **MCP specification 2025-11-25** — `https://modelcontextprotocol.io/specification/2025-11-25/` — Current spec: OAuth 2.1 authorization, elicitation, agent-side auth, resource caching, pagination, versioning, changelogs, revisions. Backs: spec maturity, server primitives, security.
-4. ★ **MCP architecture concept page** — `https://modelcontextprotocol.io/docs/concepts/architecture` — Host application behavior, client lifecycle, server primitives, stdio vs. HTTP transport design. Backs: architecture, transports.
-5. ★ **MCP transports concept page** — `https://modelcontextprotocol.io/docs/concepts/transports` — Local vs. remote transports, stdio subprocess, HTTP TLS flow, capabilities. Backs: transports.
-6. ★ **LlamaIndex MCP explainer** — `https://chat counterexample virtual agentic sycophancy.the-spike.co.uk/2026/10/30/all-you-need-to-know-about-model-context-protocol/` — One-paragraph primer on the protocol, adoption, ecosystem. Backs: definition, adoption, ecosystem.
-7. ★ **The Agentic Web (Anthropicuz) post** — `https://www.explainx.ai/blog/agentic-ai/mcp-ai-open-standard-webinar` — MCP as open standard for connecting AI agents to tools and data. Backs: definition, USB-C framing, Linux Foundation donation.
-8. ★ **MCP reference servers repository** — `https://github.com/modelcontextprotocol/servers` — Official reference servers with license, registry, ecosystem stats; ~92k stars. Backs: ecosystem, reference implementations.
-9. ★ **MCP specification & docs repository** — `https://github.com/modelcontextprotocol/modelcontextprotocol` — GitHub org for spec, docs, transports, SDKs. ~9.7k stars. Backs: spec maturity, org governance.
-10. ★ **MCP Python SDK** — `https://github.com/modelcontextprotocol/python-sdk` — Official SDK for Python servers and clients. ~25k stars. Backs: official SDK, Python integration.
-11. ★ **MCP TypeScript SDK** — `https://github.com/modelcontextprotocol/typescript-sdk` — Official SDK for TypeScript servers and clients. ~14k stars. Backs: official SDK, TS integration.
-12. ★ **MCP Rust SDK** — `https://github.com/modelcontextprotocol/rust-sdk` — Official SDK for Rust. ~4k stars. Backs: official SDK, Rust integration.
-13. ★ **Awesome MCP servers (wong2)** — `https://github.com/wong2/awesome-mcp-servers` — Curated list of ~6k+ MCP servers; highest-star community list. Backs: ecosystem (server catalog).
-14. ★ **Awesome MCP servers (appcypher)** — `https://github.com/appcypher/awesome-mcp-servers` — Another curated server list; archived but shows ecosystem momentum. Backs: ecosystem catalog (secondary).
-15. ★ **Awesome MCP servers (TensorBlock)** — `https://github.com/TensorBlock/awesome-mcp-servers` — Comprehensive collection of MCP servers with star/commit data. Backs: ecosystem growth evidence.
-16. ★ **MCP ecosystem adoption note** — `https://github.com/mcpmark-eval-liuhezi/external-source-digest/issues/2` — Digest that pulled the MCP landing page content; confirms supported clients (Claude, ChatGPT, VS Code, Cursor, MCPJam) and build-once/integrate-everywhere framing. Backs: adoption, client support, ecosystem claims.
-17. ★ **Internal external-source digest (our own tracking)** — `https://github.com/mcpmark-eval-liuhezi/external-source-digest` — Our org's digest tracking of external sources. Backs: provenance of the land-page grounding.
+1. https://modelcontextprotocol.io — Official MCP documentation site; primary source for architecture (host/client/server), transports (stdio, Streamable HTTP), and primitive definitions.
+2. https://github.com/modelcontextprotocol/modelcontextprotocol — Spec and documentation repo (~9.7k stars); confirms spec revisions (2024-11-05 → 2025-06-18 → 2025-11-25), SEP process, working groups, and MIT license.
+3. https://github.com/modelcontextprotocol/servers — Reference servers repo (~92k stars); shows the seven reference servers (Everything, Fetch, Filesystem, Git, Memory, Sequential Thinking, Time) and the stdio vs Streamable HTTP transport distinction.
+4. https://github.com/modelcontextprotocol/python-sdk — Official Python SDK (~25k stars); confirms OAuth 2.1 authorization and resource server validation for client authentication.
+5. https://github.com/modelcontextprotocol/typescript-sdk — Official TypeScript SDK (~14k stars); confirms official SDK availability across languages.
+6. https://github.com/microsoft/mcp — Microsoft's catalog of official MCP server implementations for AI-powered data access and tool integration (~3.8k stars); evidence of cross-vendor adoption.
+7. https://github.com/microsoft/mcp-for-beginners — Open-source MCP curriculum covering .NET, Java, TypeScript, JavaScript, Rust, and Python (~17.6k stars); evidence of vendor investment in MCP education.
+8. https://www.explainx.ai/blog/agentic-ai/mcp-ai-open-standard-webinar — Webinar coverage of MCP adoption by major vendors (OpenAI, Google, Microsoft); corroborates the "USB-C port for AI applications" framing and Linux Foundation stewardship.
+9. https://modelcontextprotocol.io/specification/2025-11-25/ — Current spec version documenting Streamable HTTP transport and OAuth 2.1 authorization.
+10. https://modelcontextprotocol.io/specification/2025-06-18/ — Prior spec version documenting the transition from HTTP + SSE to Streamable HTTP.
+11. https://registry.modelcontextprotocol.io/ — Official MCP Registry for browsing published servers; referenced by the servers repo as the place to list MCP servers.
+12. https://github.com/mcp (external-source-digest#2) — External digest issue referencing the protocol's "USB-C port for AI applications" framing.
 
----
+## Computed metrics (from SOURCES.md)
 
-**Distinct domains spanned by these sources: 2** (`modelcontextprotocol.io` and `github.com`).
+- **Distinct domains spanned by sources:** 6 (github.com, modelcontextprotocol.io, microsoft.com, explainx.ai).
+- **Executive summary word count:** 116 words (computed programmatically, see note in BRIEFING.md).

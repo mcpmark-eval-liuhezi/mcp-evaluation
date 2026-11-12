@@ -17,5 +17,5 @@ Every URL below backed a claim in BRIEFING.md. Claim backing is noted inline.
 
 ## Computed metrics (from SOURCES.md)
 
-- **Distinct domains spanned by sources:** 6 (github.com, modelcontextprotocol.io, microsoft.com, explainx.ai).
-- **Executive summary word count:** 116 words (computed programmatically, see note in BRIEFING.md).
+- **Distinct domains spanned by sources:** 4 (github.com, modelcontextprotocol.io, registry.modelcontextprotocol.io, www.explainx.ai).
+- **Executive summary word count:** 120 words (computed programmatically via Python `str.split()`; within the 120-word limit).

@@ -1,16 +1,16 @@
 # MCP Evaluation Briefing — Internal AI Tooling
 
-## Executive Summary (at most 120 words)
+## Executive Summary (120 words, computed programmatically)
 
-The Model Context Protocol (MCP) is an open standard, launched by Anthropic in November 2024, that standardizes how AI applications expose tools, data, and prompts to models — often described as a "USB-C port for AI applications." Built on JSON-RPC 2.0, it replaces one-off integrations with a single host connecting to many servers via one common protocol. Servers expose three core primitives: tools (LLM-callable functions), resources (read-only data), and prompts (reusable templates), plus client-side features like sampling and elicitation. It runs over two standard transports: stdio for local subprocess servers and Streamable HTTP for remote, TLS-backed deployment. Ecosystem maturity is high: OpenAI, Google, and Microsoft all adopted it, official SDKs exist for Python, TypeScript, and Rust, and the reference servers repo has roughly 92k stars. For our internal AI tooling, MCP is a low-risk, well-governed integration standard worth piloting.
+MCP is an open standard, launched by Anthropic in November 2024, that standardizes how AI applications expose tools, data, and prompts to models — often called a "USB-C port for AI applications." Built on JSON-RPC 2.0, it replaces one-off integrations with a single host connecting to many servers. Servers expose three core primitives: tools, resources, and prompts, plus client-side features like sampling and elicitation. It runs over two standard transports: stdio for local subprocess servers and Streamable HTTP for remote deployment. Adoption is broad: OpenAI, Google, and Microsoft all support it; official SDKs exist for Python, TypeScript, and Rust; and the reference servers repo has roughly 92k stars. For our internal tooling, MCP is a low-risk, well-governed standard worth piloting.
 
- word-count compute note: see SOURCES.md for the verified count.
+ word-count verify: 120 words (whitespace split, computed via Python; under the 120-word limit).
 
 ---
 
 ## 1. What is MCP?
 
-MCP is an open standard for connecting AI applications to external systems: Data sources (files, databases), tools (search, calculators), and workflows (specialized prompts). Anthropic open-sourced it in November 2024, positioning it as a universal connector across Claude, ChatGPT, and IDEs ([modelcontextprotocol.io](https://modelcontextprotocol.io)). It was subsequently donorated to the Linux Foundation's Agentic AI foundation, and adopted by major vendors ([explain MCP](https://www.explainx.ai/blog/agentic-ai/mcp-ai-open-standard-webinar)).
+MCP is an open standard, launched by Anthropic in November 2024, that standardizes how AI applications expose tools, data, and prompts to models — often described as a "USB-C port for AI applications." Built on JSON-RPC 2.0, it replaces one-off integrations with a single host connecting to many servers via one common protocol. Servers expose three core primitives: tools (LLM-callable functions), resources (read-only data), and prompts (reusable templates), plus client-side features like sampling and elicitation. It was subsequently donated to the Linux Foundation's Agentic AI foundation, and adopted by major vendors ([explain MCP](https://www.explainx.ai/blog/agentic-ai/mcp-ai-open-standard-webinar)).
 
 ## 2. Architecture: host / client / server
 
